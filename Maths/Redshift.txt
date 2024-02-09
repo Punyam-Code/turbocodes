@@ -1,0 +1,474 @@
+Amazon Redshift
+=================
+
+1. what is amazon redshift?
+
+Redshift is a datawarehouse on the cloud.
+This is the most popular cloud based datawarehouse.
+
+The charges starts from 25 cents per hour.
+
+Clean up the resources once you are done.
+
+
+2. why redshift?
+
+Disadvantages of using traditional data warehouse - on premise.
+
+=> Initial setup and maintainence cost for traditional data warehouse are high and this makes it difficult to set-up, deploy and manage the traditional DWH. (cost and resource intensive)
+
+=> Scaling the tradition DWH is difficult due to continuous upgradation of hardware.
+
+=> Possibility of loss of information due to network issue.
+
+=> Data security issues.
+
+All of these challenges faced with traditional DWH.
+
+Redshift will help us to solve these issues.
+
+
+
+3. A more formal definition of amazon redshift.
+
+Amazon redshift is a full managed, petabyte-scale, fast & scalable datawarehouse service in the cloud.
+
+1 TB = 1024 GB
+
+1 PB = 1024 TB
+
+redshift is said to be 10 times faster than traditional DWH.
+
+
+4. Amazon Redshift Architecture
+
+Redshift follows a master-slave architecture.
+
+client
+
+cluster - leader node and multiple compute nodes.
+
+for a one node cluster - the same node acts both as leader node and compute node.
+
+for a multi node cluster - leader node will be separate.
+
+Client Application -
+
+Amazon redshift integrates with various data loading and ETL tools, BI reporting tools, Data mining tools and various analytical tools.
+
+Cluster - A cluster is composed of one or more compute nodes.
+
+The client applications interact directly with the leader nodes.
+
+The compute nodes are transparent to the external applications.
+
+
+Leader node - it acts as a bridge between the client programs and the compute nodes.
+
+Leader node parses the query received from client applicattion and develops an execution plan.
+
+Compute node - Compute node executes the portion of compiled code assigned to it.
+
+Each compute node has its own dedicated CPU, memory and attached Disk storage based on type of node.
+
+There are basically 2 type of compute nodes -
+
+Dense storage node - These are storage optimized and are used to handle huge amount of data workloads. They use Hard disk drive (HDD) type storage.
+
+Dense compute node - These are compute optimized and are used to handle high performance intensive workloads. to achieve this they use SSD storage.
+
+Node Slices - A compute node is partitioned into slices.
+
+each slice holds its own cpu, storage and memory.
+
+
+
+5. what are the benefits of using amazon redshift?
+
+=> faster performance - 10 times faster performance than traditional DWH.
+
+Machine Learning
+Massively Parallel Processing
+Compute optimized hardware
+Columnar Storage
+Compression techniques
+query optimizer
+resultset caching
+
+employee
+
+101 Sumit 10000
+102 Ram   20000
+103 Kapil 15000
+
+101 Sumit 10000 102 Ram 20000 103 Kapil 15000
+
+101 102 103 Sumit Ram Kapil 10000 20000 15000
+
+Massively parallel processing -> Complex queries can be executed optimally on large amounts of data. Intermediate results obtained from multiple compute nodes can be aggregated by the leader node.
+
+Column storage -> we end up scanning less data when subset of columns are requested.
+
+Compression -> in order to utilize the storage efficiently, column level compression is used to decrease the amount of storage required. This will improve the query performance.
+
+Result caching -> The results of certain queries are cached in memory of the leader node to reduce query execution time.
+if the result is in cache then the query is skipped the next time from being executed.
+
+Easy to setup, deploy and manage - we can basically deploy in minutes with a few clicks only.
+
+Cost effective with no upfront cost.
+25 cents $.25 per hour.
+
+scale quickly to meet your needs.
+
+query your datalake - without any data movement.
+
+Amazon redshift enables us to analyse data across your data warehouse and also the data lake, together with a single service.
+
+=> quite secured.
+
+
+6. Redshift Spectrum
+
+it enables us to query the data directly thats sitting on s3 (datalake)
+
+So we can query exabytes of unstructured data in s3 without loading it.
+
+1 TB = 1024 GB
+1 PB = 1024 TB
+1 EB = 1024 PB
+
+It separates the storage and the compute resources.
+
+So with redshift spectrum in picture..
+
+we can query petabytes of data in your redshift datawarehouse, and exabytes of data in your data lake build on amazon s3.
+
+Even we can join these 2 datasets if required.
+
+
+7. use cases of amazon redshift
+
+accelerate your analytics workload
+
+unified datawarehouse and datalake
+
+modernize your on-premise data warehouse.
+
+
+
+8. Redshift durability
+
+3 copies
+
+replication within the cluster
+
+backup to s3.
+
+the failed drives/nodes are automatically replaced.
+
+
+9. Redshift Distribution Styles.
+
+Auto - redshift figures it out based on size of data and many other factors.
+
+Even - rows are distributed across slices in the round robin fashion.
+
+Key - similar to bucketing
+
+ALL - Entire able is copied on every node. (similar to broadcast join.)
+
+
+
+employee data - empid.
+
+
+4 slices
+
+slice0 - 4
+slice1 - 1
+slice2 - 2, 10 , 10, 10, 10
+slice3 - 3
+
+
+1 % 4
+2
+3
+4
+5
+6
+7
+8
+9
+10
+10
+10
+10
+
+
+
+
+10. Redshift sort keys
+
+Rows are stored in disk in sorted order based on column that you designate as the sort key.
+
+empid.
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+It works like an index.
+
+quick filtering, searching, Joins.
+
+SMB join
+
+Sort merge Bucket join..
+
+join column should be bucketed (key distribution)
+
+we should be having it as the sort key.
+
+
+11. Data from S3 to redshift
+
+copy command will help us to load the data from S3 to redshift
+
+Unload command will help us to send the data to s3 from redshift.
+
+
+Redshift Practicals
+====================
+
+step 1: we will upload our data to S3
+
+step 2: create redshift tables
+
+create table users(
+userid integer not null distkey sortkey,
+username char(8),
+firstname varchar(30),
+lastname varchar(30),
+city varchar(30),
+state char(2),
+email varchar(100),
+phone char(14),
+likesports boolean,
+liketheatre boolean,
+likeconcerts boolean,
+likejazz boolean,
+likeclassical boolean,
+likeopera boolean,
+likerock boolean,
+likevegas boolean,
+likebroadway boolean,
+likemusicals boolean);
+
+
+create table venue(
+venueid smallint not null distkey sortkey,
+venuename varchar(100),
+venuecity varchar(30),
+venuestate char(2),
+venueseats integer);
+
+
+create table category(
+catid smallint not null distkey sortkey,
+catgroup varchar(10),
+catname varchar(10),
+catdesc varchar(50));
+
+
+create table date(
+dateid smallint not null distkey sortkey,
+caldate date not null,
+day character(3) not null,
+week smallint not null,
+month character(5) not null,
+qtr character(5) not null,
+year smallint not null,
+holiday boolean default('N'));
+
+
+create table event(
+eventid integer not null distkey,
+venueid smallint not null,
+catid smallint not null,
+dateid smallint not null sortkey,
+eventname varchar(200),
+starttime timestamp);
+
+
+create table listing(
+listid integer not null distkey,
+sellerid integer not null,
+eventid integer not null,
+dateid smallint not null  sortkey,
+numtickets smallint not null,
+priceperticket decimal(8,2),
+totalprice decimal(8,2),
+listtime timestamp);
+
+
+create table sales(
+salesid integer not null,
+listid integer not null distkey,
+sellerid integer not null,
+buyerid integer not null,
+eventid integer not null,
+dateid smallint not null sortkey,
+qtysold smallint not null,
+pricepaid decimal(8,2),
+commission decimal(8,2),
+saletime timestamp);
+
+
+step 3: load the data from s3 to redshift tables.
+
+copy users from 's3://test-aws/tickitdb/allusers_pipe.txt' credentials 'aws_iam_role=arn:aws:iam::773220148882:role/RedshiftRole' delimiter '|' region 'us-east-2'
+
+
+copy venue from 's3://test-aws/tickitdb/venue_pipe.txt'
+credentials  'aws_iam_role=arn:aws:iam::773220148882:role/RedshiftRole' delimiter '|' region 'us-east-2';
+
+copy category from 's3://test-aws/tickitdb/category_pipe.txt' credentials  'aws_iam_role=arn:aws:iam::773220148882:role/RedshiftRole' delimiter '|' region 'us-east-2';
+
+copy date from 's3://test-aws/tickitdb/date2008_pipe.txt'
+credentials  'aws_iam_role=arn:aws:iam::773220148882:role/RedshiftRole' delimiter '|' region 'us-east-2';
+
+copy event from 's3://test-aws/tickitdb/allevents_pipe.txt'
+credentials  'aws_iam_role=arn:aws:iam::773220148882:role/RedshiftRole' delimiter '|' timeformat 'YYYY-MM-DD HH:MI:SS' region 'us-east-2';
+
+copy listing from 's3://test-aws/tickitdb/listings_pipe.txt'
+credentials  'aws_iam_role=arn:aws:iam::773220148882:role/RedshiftRole'
+delimiter '|' region 'us-east-2';
+
+copy sales from 's3://test-aws/tickitdb/sales_tab.txt'
+credentials  'aws_iam_role=arn:aws:iam::773220148882:role/RedshiftRole'
+delimiter '\t' timeformat 'MM/DD/YYYY HH:MI:SS' region 'us-east-2';
+
+
+-- Get definition for the sales table.
+SELECT *    
+FROM pg_table_def    
+WHERE tablename = 'sales';
+
+-- Find total sales on a given calendar date.
+SELECT sum(qtysold)
+FROM   sales, date
+WHERE  sales.dateid = date.dateid
+AND    caldate = '2008-01-05';
+
+
+-- Find top 10 buyers by quantity.
+SELECT firstname, lastname, total_quantity
+FROM   (SELECT buyerid, sum(qtysold) total_quantity
+FROM  sales
+GROUP BY buyerid
+ORDER BY total_quantity desc limit 10) Q, users
+WHERE Q.buyerid = userid
+ORDER BY Q.total_quantity desc;
+
+
+-- Find events in the 99.9 percentile in terms of all time gross sales.
+SELECT eventname, total_price
+FROM  (SELECT eventid, total_price, ntile(1000) over(order by total_price desc) as percentile
+FROM (SELECT eventid, sum(pricepaid) total_price
+FROM   sales
+GROUP BY eventid)) Q, event E
+WHERE Q.eventid = E.eventid
+AND percentile = 1
+ORDER BY total_price desc;
+
+
+Redshift Spectrum
+==================
+
+Database
+
+inside a database we can have multiple schemas..
+
+public..
+
+
+
+create external schema spectrum
+from data catalog
+database 'spectrumdb'
+iam_role 'arn:aws:iam::773220148882:role/RedshiftRole'
+create external database if not exists;
+
+
+Redshift Spectrum
+
+Step 1: Have the data in S3 test-aws/sales folder
+
+Step 2: creating external schema
+
+create external schema spectrum
+from data catalog
+database 'spectrumdb'
+iam_role 'arn:aws:iam::773220148882:role/RedshiftRole'
+create external database if not exists;
+
+step 3: creating external table which refers to our data in S3
+
+create external table spectrum.salesnew(
+salesid integer,
+listid integer,
+sellerid integer,
+buyerid integer,
+eventid integer,
+dateid smallint,
+qtysold smallint,
+pricepaid decimal(8,2),
+commission decimal(8,2),
+saletime timestamp)
+row format delimited
+fields terminated by '\t'
+stored as textfile
+location 's3://test-aws/sales/';
+
+step 4: see if we are able to query the data.
+
+select count(*) from spectrum.salesnew;
+
+step 5: join a redshift & a redshift spectrum table.
+That means we are joining the data sitting on s3 with data sitting in our warehouse.
+
+select top 10 spectrum.salesnew.eventid, sum(spectrum.salesnew.pricepaid) from spectrum.salesnew, event
+where spectrum.salesnew.eventid = event.eventid
+and spectrum.salesnew.pricepaid > 30
+group by spectrum.salesnew.eventid
+order by 2 desc;
+
+Just in case you want to see list of all schema's.
+
+select * from pg_namespace;
+
+
+
+Setup SQL workbench
+====================
+
+Download - sql workbench
+
+Download necessary Jars
+https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/1.2.51.1078/RedshiftJDBC42-no-awssdk-1.2.51.1078.jar
+
+com.amazon.redshift.jdbc42.Driver
+
+jdbc:redshift://test-redshift-cluster.ckft5mtkyl1o.us-east-2.redshift.amazonaws.com:5439/dev
+
+
+
+DO NOT FORGET TO DELETE THE CLUSTER
